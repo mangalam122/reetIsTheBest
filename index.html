@@ -332,39 +332,83 @@ function loop(){
   renderer.render(scene,camera);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 
-/* ================= chiptune audio ================= */
-let AC,muted=false,master;
-function ac(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.connect(AC.destination)}
-  if(AC.state=="suspended")AC.resume();return AC}
+/* ================= cozy farm soundtrack (all synthesized, original) ================= */
+let AC,muted=false,master,dry,wet,rainGain,mStep=0,mNext=0,birdT=0,crickT=0,stepT=0;
 const hz=n=>440*2**((n-69)/12);
-function note(type,f,dur,vol=.1,when=0,f1){if(!AC)return;const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();
-  o.type=type;o.frequency.setValueAtTime(f,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);o.connect(g).connect(master);o.start(t);o.stop(t+dur+.05)}
-function noise(dur,freq,vol=.15){if(!AC)return;const b=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate),ch=b.getChannelData(0);
-  for(let i=0;i<ch.length;i++)ch[i]=(Math.random()*2-1)*(1-i/ch.length);
-  const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();f.type="bandpass";f.frequency.value=freq;g.gain.value=vol;s.buffer=b;s.connect(f).connect(g).connect(master);s.start()}
+function ac(){
+  if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain();master.connect(AC.destination);
+    dry=AC.createGain();dry.connect(master);
+    // small room reverb from a decaying noise impulse
+    const len=AC.sampleRate*2.2,ir=AC.createBuffer(2,len,AC.sampleRate);
+    for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len)**3}
+    const cv=AC.createConvolver();cv.buffer=ir;wet=AC.createGain();wet.gain.value=.32;cv.connect(wet).connect(master);dry.cv=cv;
+    // rain ambience loop
+    const nb=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+    const src=AC.createBufferSource();src.buffer=nb;src.loop=true;
+    const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=1800;const hp=AC.createBiquadFilter();hp.type="highpass";hp.frequency.value=300;
+    rainGain=AC.createGain();rainGain.gain.value=0;src.connect(lp).connect(hp).connect(rainGain).connect(master);src.start()}
+  if(AC.state=="suspended")AC.resume();return AC}
+const out=(node,rev=.6)=>{node.connect(dry);if(rev){const s=AC.createGain();s.gain.value=rev;node.connect(s).connect(dry.cv)}};
+function env(g,t,a,peak,d){g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d)}
+function osc(type,f,t,dur,peak,{a=.005,rev=.6,f1,lp}={}){const o=AC.createOscillator(),g=AC.createGain();o.type=type;
+  o.frequency.setValueAtTime(f,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);env(g,t,a,peak,dur);
+  let n=o.connect(g);if(lp){const F=AC.createBiquadFilter();F.type="lowpass";F.frequency.value=lp;n=n.connect(F)}
+  out(n,rev);o.start(t);o.stop(t+a+dur+.05)}
+// plucked nylon-guitar-ish tone
+function pluck(n,t,v=.07){const f=hz(n);osc("triangle",f,t,1.4,v,{lp:2200});osc("sine",f*2,t,.5,v*.35,{rev:.4})}
+// soft wooden flute with vibrato
+function flute(n,t,dur,v=.05){const f=hz(n),o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();
+  o.type="sine";o2.type="triangle";o.frequency.value=f;o2.frequency.value=f;l.frequency.value=5.2;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(f*.006,t+.25);
+  l.connect(lg);lg.connect(o.frequency);lg.connect(o2.frequency);
+  const g2=AC.createGain();g2.gain.value=.25;o2.connect(g2).connect(g);o.connect(g);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.07);g.gain.setValueAtTime(v*.85,t+Math.max(.08,dur-.08));g.gain.exponentialRampToValueAtTime(.0001,t+dur+.25);
+  out(g,.9);[o,o2,l].forEach(x=>{x.start(t);x.stop(t+dur+.3)})}
+function noiseHit(t,dur,freq,v,type="bandpass",rev=.2){const b=AC.createBuffer(1,Math.max(1,AC.sampleRate*dur),AC.sampleRate),c=b.getChannelData(0);
+  for(let i=0;i<c.length;i++)c[i]=(Math.random()*2-1)*(1-i/c.length)**2;
+  const s=AC.createBufferSource(),F=AC.createBiquadFilter(),g=AC.createGain();F.type=type;F.frequency.value=freq;g.gain.value=v;s.buffer=b;out(s.connect(F).connect(g),rev);s.start(t)}
+const T=()=>AC.currentTime;
 const S={
-  blip:()=>note("square",hz(84+Math.floor(Math.random()*3)),.03,.025),
-  pop:()=>note("square",hz(79),.08,.06,0,hz(91)),
-  plant:()=>{note("triangle",180,.12,.2,0,80);noise(.1,600,.1)},
-  water:()=>noise(1.4,2400,.08),
-  chime:()=>[76,79,84].forEach((n,i)=>note("triangle",hz(n),.4,.08,i*.1)),
-  bloom:()=>[72,76,79,84,88].forEach((n,i)=>note("square",hz(n),.18,.04,i*.06)),
-  item:()=>[[67,0],[72,.12],[76,.24],[79,.36],[84,.48],[79,.62],[84,.74]].forEach(([n,w],i)=>note("square",hz(n),i>4?.5:.14,.06,w)),
-  heart:()=>note("sine",hz(88),.2,.07,0,hz(96)),
-  fanfare:()=>[[72,0],[76,.15],[79,.3],[84,.45],[84,.75],[88,.9],[91,1.05]].forEach(([n,w])=>{note("square",hz(n),.35,.05,w);note("triangle",hz(n-12),.35,.06,w)}),
+  blip:()=>AC&&osc("sine",hz(86+Math.floor(Math.random()*4)),T(),.04,.03,{rev:0}),
+  pop:()=>AC&&osc("sine",hz(81),T(),.12,.08,{f1:hz(93)}),
+  step:()=>AC&&noiseHit(T(),.07,420+Math.random()*120,.25,"lowpass",0),
+  plant:()=>{if(!AC)return;noiseHit(T(),.12,500,.5,"lowpass",.1);osc("sine",160,T(),.15,.18,{f1:70,rev:.1})},
+  water:()=>{if(!AC)return;for(let i=0;i<14;i++)osc("sine",rand(1400,2600),T()+i*.09+rand(0,.05),.08,.035,{f1:rand(500,900),rev:.5});noiseHit(T(),1.4,2600,.07)},
+  chime:()=>AC&&[79,83,86,91].forEach((n,i)=>osc("sine",hz(n),T()+i*.09,1.2,.05,{rev:1})),
+  bloom:()=>AC&&[72,76,79,83,84,88].forEach((n,i)=>pluck(n,T()+i*.045,.06)),
+  item:()=>{if(!AC)return;const t=T();[[67,0],[71,.1],[74,.2],[79,.3]].forEach(([n,w])=>pluck(n,t+w,.08));
+    [83,86,91].forEach((n,i)=>osc("sine",hz(n),t+.45+i*.12,1.4,.07,{rev:1}));flute(91,t+.45,.9,.05)},
+  heart:()=>AC&&osc("sine",hz(88),T(),.25,.06,{f1:hz(95),rev:.8}),
+  fanfare:()=>{if(!AC)return;const t=T();[[72,76,79],[74,77,81],[76,79,84]].forEach((ch,i)=>ch.forEach(n=>pluck(n,t+i*.32,.07)));
+    flute(84,t+.96,.5);flute(88,t+1.46,.5);flute(91,t+1.96,1.4)},
+  bird:()=>{if(!AC)return;const t=T(),b=rand(2600,3800),n=2+Math.floor(Math.random()*3);
+    for(let i=0;i<n;i++)osc("sine",b*rand(.9,1.1),t+i*.13,.09,.025,{f1:b*rand(1.2,1.5),rev:.7})},
+  cricket:()=>{if(!AC)return;const t=T();for(let i=0;i<6;i++)osc("square",4300,t+i*.045,.02,.006,{rev:.3,lp:5000})},
 };
-// cozy background loop
-const MEL=[76,79,81,79, 76,74,72,74, 76,79,84,83, 81,79,76,0, 74,76,79,76, 74,72,69,72, 74,76,74,72, 72,0,0,0];
-const BASS=[48,43,48,45,41,45,43,48];
-let mStep=0,mNext=0;
-function music(){if(!AC||muted)return;const beat=.32;
-  while(mNext<AC.currentTime+.4){const n=MEL[mStep%MEL.length],w=mNext-AC.currentTime;
-    if(n)note("triangle",hz(n),beat*.9,.045,Math.max(0,w));
-    if(mStep%4==0){note("sine",hz(BASS[(mStep/4)%BASS.length]),beat*3.5,.07,Math.max(0,w))}
-    mStep++;mNext+=beat}}
-setInterval(music,120);
-$("mute").onclick=()=>{muted=!muted;master&&(master.gain.value=muted?0:1);$("mute").textContent=muted?"🔇":"🔊";if(!muted&&AC)mNext=AC.currentTime};
+// background music: 24-bar loop. Chords are plucked 8th-note arpeggios; a flute sings the melody.
+const CH=[[48,4],[45,3],[41,4],[43,4],[40,3],[41,4],[38,3],[43,4]]; // root, third(3=minor,4=major)
+const PROG=[0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7];
+const MEL=[ // [midi, beats] per bar, 0 = rest
+  [[76,1.5],[74,.5],[72,1],[79,1]],[[81,2],[79,1],[76,1]],[[77,1.5],[76,.5],[74,1],[72,1]],[[74,3],[0,1]],
+  [[76,1],[79,1],[83,1.5],[81,.5]],[[81,2],[79,1],[77,1]],[[77,1.5],[76,.5],[74,1],[77,1]],[[79,3],[0,1]],
+  [[76,1.5],[74,.5],[72,1],[79,1]],[[81,2],[79,1],[76,1]],[[77,1.5],[76,.5],[74,1],[72,1]],[[74,1],[76,1],[77,1],[79,1]],
+  [[83,1.5],[81,.5],[79,1],[76,1]],[[84,2],[81,1],[77,1]],[[86,1],[84,1],[81,1],[77,1]],[[79,4]],
+  [[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]]];
+const BEAT=60/92;
+function music(){if(!AC||muted)return;
+  while(mNext<AC.currentTime+.5){const bar=mStep%24,[r,third]=CH[PROG[bar]],t=Math.max(mNext,AC.currentTime+.01);
+    const arp=[r,r+7,r+12,r+12+third,r+19,r+12+third,r+12,r+7];
+    arp.forEach((n,i)=>pluck(n,t+i*BEAT/2,i==0?.075:.05));
+    osc("sine",hz(r-12),t,BEAT*3.6,.07,{a:.03,rev:.2});
+    let off=0;for(const [n,b] of MEL[bar]){if(n)flute(n,t+off*BEAT,b*BEAT*.95);off+=b}
+    mStep++;mNext+=BEAT*4}}
+setInterval(()=>{music();if(!AC||muted)return;
+  const day=skyNow.star<.3&&!raining,night=skyNow.star>.7;
+  rainGain.gain.value+=((raining?.12:0)-rainGain.gain.value)*.2;
+  if(day&&T()>birdT){S.bird();birdT=T()+rand(2.5,6)}
+  if(night&&T()>crickT){S.cricket();crickT=T()+rand(.4,1.2)}
+  if(walking&&T()>stepT){S.step();stepT=T()+.24}},120);
+$("mute").onclick=()=>{muted=!muted;master&&(master.gain.value=muted?0:1);$("mute").textContent=muted?"🔇":"🔊";if(!muted&&AC)mNext=AC.currentTime+.05};
 
 /* ================= HUD ================= */
 let hearts=1;
@@ -444,7 +488,7 @@ async function next(){
   busy=false;if(st.choice)$("choices").classList.remove("hide");else $("nextA").classList.remove("hide")}
 $("box").addEventListener("click",e=>{if(e.target.closest("#choices"))return;next()});
 
-$("newgame").onclick=async()=>{ac();mNext=AC.currentTime+.1;S.chime();$("title").classList.add("hide");
+$("newgame").onclick=async()=>{ac();mNext=AC.currentTime+.3;S.chime();$("title").classList.add("hide");
   mode="story";$("hud").classList.remove("hide");drawHearts();await sleep(300);$("dlg").classList.remove("hide");next()};
 
 $("yes").onclick=async()=>{$("choices").classList.add("hide");S.fanfare();
