@@ -2,188 +2,507 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2a0f24">
-<title>Sorry Reet 💛</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#2b1a10">
+<title>Reet Valley 🌻</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{
-  min-height:100dvh;overflow-x:hidden;color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:radial-gradient(120% 80% at 50% 0%,#5c1f4a 0%,#2a0f24 55%,#140712 100%);
-  display:flex;flex-direction:column;align-items:center;
-  padding:max(24px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));
-  text-align:center;
-}
-h1{
-  font-family:"Dancing Script",cursive;font-size:clamp(44px,13vw,72px);line-height:1.05;
-  background:linear-gradient(90deg,#ffd54a,#ff9ec4,#ffd54a);background-size:200% 100%;
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  animation:shine 4s linear infinite;filter:drop-shadow(0 4px 14px rgba(255,120,180,.35));
-}
-@keyframes shine{to{background-position:200% 0}}
-.sub{opacity:.85;margin-top:6px;font-size:15px}
-.stage{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;perspective:900px}
-#go,#yes{
-  margin-top:28px;border:0;cursor:pointer;font-size:20px;font-weight:600;color:#3a1030;
-  padding:16px 30px;border-radius:999px;
-  background:linear-gradient(135deg,#ffe066,#ffb3d1);
-  box-shadow:0 10px 30px rgba(255,150,200,.45),inset 0 -3px 0 rgba(0,0,0,.12);
-  animation:pulse 1.8s ease-in-out infinite;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;overflow:hidden;background:#2b1a10;touch-action:manipulation}
+body{font-family:"Pixelify Sans",monospace;color:#3b1f0b}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.hide{display:none!important}
+
+/* Stardew-style wooden/parchment frame */
+.frame{background:#f7d9a0;border:4px solid #5b2b0a;border-radius:6px;
+  box-shadow:inset 0 0 0 3px #e0913a,inset 0 0 0 6px #f7d9a0,inset 0 0 0 7px #d9a560,0 4px 0 rgba(0,0,0,.35)}
+.btn{font:700 20px "Pixelify Sans",monospace;color:#3b1f0b;padding:12px 26px;cursor:pointer;
+  background:#f7d9a0;border:4px solid #5b2b0a;border-radius:6px;box-shadow:inset 0 -5px 0 #d9a560,0 4px 0 rgba(0,0,0,.35)}
+.btn:active{transform:translateY(3px);box-shadow:inset 0 -2px 0 #d9a560,0 1px 0 rgba(0,0,0,.35)}
+
+/* title */
+#title{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;
+  padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+#logo{font-weight:700;font-size:clamp(54px,17vw,96px);line-height:.95;color:#ffe066;text-align:center;
+  -webkit-text-stroke:3px #5b2b0a;paint-order:stroke fill;
+  text-shadow:0 4px 0 #e07b1a,0 8px 0 #5b2b0a,0 14px 18px rgba(0,0,0,.35);animation:float 3s ease-in-out infinite}
+#logo span{display:block;color:#9be15d;font-size:.82em}
+@keyframes float{50%{transform:translateY(-8px)}}
+#tag{font-size:18px;color:#fff;text-shadow:0 2px 0 #5b2b0a,2px 0 0 #5b2b0a,-2px 0 0 #5b2b0a,0 -2px 0 #5b2b0a;margin-bottom:22px}
+#newgame{font-size:24px;padding:14px 34px;animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.06)}}
-.arrow{font-size:46px;margin-top:22px;animation:bob 1s ease-in-out infinite;display:block}
-@keyframes bob{50%{transform:translateY(10px)}}
-#bq{display:none;width:min(90vw,420px,50dvh);height:auto;transform-style:preserve-3d;
-  filter:drop-shadow(0 18px 24px rgba(0,0,0,.45));animation:sway 6s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotateY(-10deg) rotateX(4deg)}50%{transform:rotateY(10deg) rotateX(4deg)}}
-.on #bq{display:block}
-.on #intro{display:none}
-.stem{stroke-dasharray:1;stroke-dashoffset:1}
-.on .stem{animation:draw 1.1s ease-out forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-.fl,.wrap,.bow{transform-box:fill-box;transform-origin:center;transform:scale(0);opacity:0}
-.on .wrap{animation:pop .7s cubic-bezier(.3,1.6,.5,1) forwards}
-.on .fl{animation:bloom 1s cubic-bezier(.3,1.5,.5,1) forwards}
-.on .bow{animation:pop .6s cubic-bezier(.3,1.6,.5,1) 2.4s forwards}
-@keyframes pop{to{transform:scale(1);opacity:1}}
-@keyframes bloom{0%{transform:scale(0) rotate(-40deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-#msg{opacity:0;transform:translateY(12px);transition:1s;margin-top:10px;font-size:17px;line-height:1.5;max-width:340px}
-#msg b{font-family:"Dancing Script",cursive;font-size:26px;color:#ffd54a}
-.show{opacity:1!important;transform:none!important}
-#yes{margin-top:14px;padding:12px 26px;font-size:17px;animation:none}
-.p{position:fixed;top:-30px;pointer-events:none;font-size:20px;animation:fall linear forwards;z-index:9}
-@keyframes fall{to{transform:translateY(110dvh) rotate(540deg)}}
-.h{position:fixed;pointer-events:none;font-size:26px;animation:up 1.6s ease-out forwards;z-index:9}
-@keyframes up{to{transform:translate(var(--x),-60vh) scale(1.4);opacity:0}}
-@media (prefers-reduced-motion:reduce){#bq{animation:none}}
+.snd{margin-top:14px;font-size:14px;color:#fff;text-shadow:0 2px 0 #5b2b0a}
+
+/* HUD */
+#hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;
+  padding:max(10px,env(safe-area-inset-top)) 10px 0;z-index:5;pointer-events:none}
+#hearts{padding:8px 10px;font-size:13px;font-weight:700}
+#hearts .row{font-size:15px;letter-spacing:1px;margin-top:2px;color:#c9b08a}
+#hearts .row b{color:#e8344f;font-weight:400}
+#clock{padding:8px 12px;text-align:right;font-size:15px;font-weight:700;line-height:1.25}
+#clock small{font-size:13px;font-weight:400}
+#mute{pointer-events:auto;margin-top:6px;font-size:13px;padding:4px 8px;float:right}
+
+/* dialogue */
+#dlg{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);
+  width:min(96vw,560px);z-index:6;display:flex;gap:8px;align-items:stretch}
+#box{flex:1;padding:14px 16px 26px;min-height:132px;font-size:18px;line-height:1.35;position:relative;cursor:pointer}
+#name{position:absolute;top:-22px;left:10px;padding:2px 12px;font-size:15px;font-weight:700}
+#side{width:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;gap:4px}
+#portrait{width:72px;height:72px;image-rendering:pixelated;background:#e8b97a;border:3px solid #5b2b0a}
+#side b{font-size:14px}
+#nextA{position:absolute;right:12px;bottom:6px;font-size:20px;color:#b8432f;animation:nb .6s ease-in-out infinite}
+@keyframes nb{50%{transform:translateY(-4px)}}
+#choices{display:flex;gap:10px;justify-content:center;margin-top:10px}
+#choices .btn{font-size:18px;padding:8px 22px}
+#no.run{position:fixed;z-index:9;transition:left .2s,top .2s}
+
+/* item popup */
+#item{position:fixed;left:50%;top:22%;transform:translate(-50%,-50%) scale(0);z-index:7;padding:12px 18px;text-align:center;
+  transition:transform .4s cubic-bezier(.3,1.7,.5,1)}
+#item.on{transform:translate(-50%,-50%) scale(1)}
+#item h3{font-size:20px;color:#b8432f}
+#item p{font-size:15px}
+
+/* ending letter */
+#letter{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);width:min(90vw,380px);z-index:8;
+  padding:22px 20px;text-align:center;transition:transform .6s cubic-bezier(.3,1.5,.5,1)}
+#letter.on{transform:translate(-50%,-50%) scale(1)}
+#letter h2{font-size:30px;color:#b8432f;margin-bottom:6px}
+#letter p{font-size:17px;line-height:1.45;margin-bottom:8px}
+#letter .hrt{font-size:22px;color:#e8344f;letter-spacing:2px}
+
+.fx{position:fixed;pointer-events:none;z-index:9;color:#e8344f;font-family:"Pixelify Sans";text-shadow:0 2px 0 #5b2b0a;animation:rise 1.8s ease-out forwards}
+@keyframes rise{to{transform:translate(var(--x),-60vh) scale(1.3);opacity:0}}
+#err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;padding:30px;text-align:center}
 </style>
 </head>
 <body>
-<h1>Sorry Reet</h1>
-<p class="sub">I made you something… 🥺</p>
+<canvas id="c"></canvas>
 
-<div class="stage" id="stage">
-  <div id="intro">
-    <span class="arrow">👇</span>
-    <button id="go">Tap here ➜ 💐</button>
-  </div>
-
-  <svg id="bq" viewBox="0 0 400 540" aria-label="Bouquet of sunflowers and lilies">
-    <defs>
-      <radialGradient id="sp" cx="50%" cy="85%" r="80%">
-        <stop offset="0" stop-color="#ff9f00"/><stop offset=".55" stop-color="#ffc928"/><stop offset="1" stop-color="#fff07a"/>
-      </radialGradient>
-      <radialGradient id="sc" cx="40%" cy="35%" r="70%">
-        <stop offset="0" stop-color="#8a5a2b"/><stop offset=".6" stop-color="#4a2a12"/><stop offset="1" stop-color="#2a1608"/>
-      </radialGradient>
-      <linearGradient id="lp" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0" stop-color="#ff4f9a"/><stop offset=".45" stop-color="#ff9cc7"/><stop offset="1" stop-color="#fff4f8"/>
-      </linearGradient>
-      <linearGradient id="lw" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0" stop-color="#ffe680"/><stop offset=".4" stop-color="#fffdf2"/><stop offset="1" stop-color="#ffffff"/>
-      </linearGradient>
-      <linearGradient id="st" x1="0" x2="1">
-        <stop offset="0" stop-color="#2f7d32"/><stop offset=".5" stop-color="#66bb6a"/><stop offset="1" stop-color="#2f7d32"/>
-      </linearGradient>
-      <linearGradient id="wp" x1="0" x2="1">
-        <stop offset="0" stop-color="#c2185b"/><stop offset=".35" stop-color="#f48fb1"/><stop offset=".6" stop-color="#fce4ec"/><stop offset="1" stop-color="#ad1457"/>
-      </linearGradient>
-      <linearGradient id="wp2" x1="0" x2="1">
-        <stop offset="0" stop-color="#f8bbd0"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#f8bbd0"/>
-      </linearGradient>
-      <pattern id="seeds" width="5" height="5" patternUnits="userSpaceOnUse">
-        <circle cx="2.5" cy="2.5" r="1" fill="#1a0d04" opacity=".7"/>
-      </pattern>
-    </defs>
-    <g id="stems"></g>
-    <g id="leaves"></g>
-    <path class="wrap" d="M60 250 L200 530 L340 250 Q300 285 270 262 Q240 292 200 266 Q160 292 130 262 Q100 285 60 250Z" fill="url(#wp)" style="animation-delay:.1s"/>
-    <path class="wrap" d="M105 300 L200 530 L295 300 Q250 330 200 312 Q150 330 105 300Z" fill="url(#wp2)" opacity=".55" style="animation-delay:.2s"/>
-    <g id="flowers"></g>
-    <g class="bow">
-      <path d="M200 430 C160 400 140 440 168 452 C180 456 192 444 200 430Z M200 430 C240 400 260 440 232 452 C220 456 208 444 200 430Z" fill="#ffd54a" stroke="#e6a800" stroke-width="2"/>
-      <path d="M196 432 L180 490 L192 486 L200 498 L204 432Z M204 432 L222 488 L210 486 L200 498Z" fill="#ffca28"/>
-      <circle cx="200" cy="432" r="9" fill="#ffb300"/>
-    </g>
-  </svg>
-
-  <p id="msg">I'm really sorry, <b>Reet</b>.<br>Sunflowers because you're my sunshine 🌻<br>Lilies because you're the prettiest 🌸<br>Forgive me? 🥹</p>
-  <button id="yes" style="display:none" class="btn">Yes 💛</button>
+<div id="title">
+  <div id="logo">Reet<span>Valley</span></div>
+  <div id="tag">~ a little sorry story ~</div>
+  <button id="newgame" class="btn">▶ New Game</button>
+  <div class="snd">🔊 sound on for the full experience</div>
 </div>
 
-<script>
-const NS="http://www.w3.org/2000/svg",$=id=>document.getElementById(id);
-const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+<div id="hud" class="hide">
+  <div id="hearts" class="frame">Reet<div class="row" id="hrow"></div></div>
+  <div><div id="clock" class="frame"><span id="day">Spr. 1</span><br><small id="time">6:00am ☂</small></div>
+    <button id="mute" class="btn">🔊</button></div>
+</div>
 
-function sunflower(x,y,r,d){
-  const g=el("g",{class:"fl",style:`animation-delay:${d}s`},$("flowers"));
-  const t=el("g",{transform:`translate(${x} ${y})`},g);
-  for(let ring=0;ring<2;ring++)for(let i=0;i<16;i++){
-    el("ellipse",{cx:0,cy:-r*.68,rx:r*.17,ry:r*.42,fill:"url(#sp)",
-      transform:`rotate(${i*22.5+ring*11.25})`,opacity:ring?1:.85},t);
-  }
-  el("circle",{r:r*.42,fill:"url(#sc)"},t);
-  el("circle",{r:r*.42,fill:"url(#seeds)"},t);
-  el("circle",{r:r*.16,cx:-r*.12,cy:-r*.12,fill:"#fff",opacity:.12},t);
-}
-function lily(x,y,r,rot,d,grad){
-  const g=el("g",{class:"fl",style:`animation-delay:${d}s`},$("flowers"));
-  const t=el("g",{transform:`translate(${x} ${y}) rotate(${rot})`},g);
-  const P=`M0 0 C${r*.38} ${-r*.3} ${r*.3} ${-r*.8} 0 ${-r} C${-r*.3} ${-r*.8} ${-r*.38} ${-r*.3} 0 0Z`;
-  [30,150,270,90,210,330].forEach((a,i)=>{
-    const pg=el("g",{transform:`rotate(${a}) scale(${i<3?1:.9})`},t);
-    el("path",{d:P,fill:`url(#${grad})`,stroke:"rgba(180,40,100,.25)","stroke-width":1},pg);
-    el("path",{d:`M0 ${-r*.1} L0 ${-r*.85}`,stroke:"rgba(200,40,110,.35)","stroke-width":1.2},pg);
-    for(let k=0;k<4;k++)el("circle",{cx:(k%2?3:-3),cy:-r*(.2+k*.08),r:1.2,fill:"#b0124f",opacity:.6},pg);
-  });
-  for(let i=0;i<6;i++){
-    const a=(i*60+15)*Math.PI/180,ex=Math.cos(a)*r*.45,ey=Math.sin(a)*r*.45;
-    el("line",{x1:0,y1:0,x2:ex,y2:ey,stroke:"#c5e1a5","stroke-width":1.5},t);
-    el("ellipse",{cx:ex,cy:ey,rx:4,ry:2,fill:"#e65100",transform:`rotate(${i*60+15} ${ex} ${ey})`},t);
-  }
-}
-function stem(x,y,bend){
-  el("path",{class:"stem",pathLength:1,d:`M200 470 Q${(200+x)/2+bend} ${(470+y)/2} ${x} ${y}`,
-    stroke:"url(#st)","stroke-width":5,fill:"none","stroke-linecap":"round"},$("stems"));
-}
-function leaf(x,y,a,d){
-  const g=el("g",{class:"fl",style:`animation-delay:${d}s`},$("leaves"));
-  el("path",{d:"M0 0 C20 -18 50 -14 62 0 C50 14 20 18 0 0Z",fill:"#43a047",stroke:"#2e7d32","stroke-width":1.5,
-    transform:`translate(${x} ${y}) rotate(${a})`},g);
-}
+<div id="dlg" class="hide">
+  <div id="box" class="frame"><div id="name" class="frame hide"></div><div id="txt"></div>
+    <div id="choices" class="hide"><button id="yes" class="btn">Yes 💛</button><button id="no" class="btn">No</button></div>
+    <div id="nextA">▶</div></div>
+  <div id="side" class="frame hide"><canvas id="portrait" width="16" height="16"></canvas><b>Me</b></div>
+</div>
 
-// layout: [type, x, y, size, rotation, gradient]
-const F=[
-  ["l",95,215,52,-20,"lp"],["l",305,215,52,20,"lw"],
-  ["s",140,150,58],["s",262,145,60],
-  ["l",200,85,50,0,"lp"],["l",75,130,42,-30,"lw"],["l",325,125,42,30,"lp"],
-  ["s",200,195,66],
+<div id="item" class="frame"><h3>★ You got: Bouquet! ★</h3><p>Sunflowers &amp; lilies.<br>Give it to someone special.</p></div>
+
+<div id="letter" class="frame">
+  <h2>Dear Reet,</h2>
+  <p>I'm really sorry. You mean the whole valley to me. I'll keep growing things for you, every season. 🌻</p>
+  <div class="hrt">♥♥♥♥♥♥♥♥♥♥</div>
+  <p style="margin-top:8px">— your farmer</p>
+  <button id="again" class="btn" style="font-size:16px;padding:8px 18px">↺ Play again</button>
+</div>
+
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js";
+
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+/* ================= renderer (low-res → pixel art look) ================= */
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas:$("c"),antialias:false,powerPreference:"high-performance"})}
+catch(e){document.body.innerHTML='<div id="err">Please open this in Safari or Chrome 💛</div>';throw e}
+renderer.setPixelRatio(1);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.BasicShadowMap;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(50,1,.1,300);
+const camLook=new THREE.Vector3(0,.8,0);
+function resize(){
+  const W=innerWidth,H=innerHeight,PIX=Math.max(2,Math.round(Math.min(W,H)/210));
+  renderer.setSize(Math.ceil(W/PIX),Math.ceil(H/PIX),false);
+  camera.aspect=W/H;camera.fov=camera.aspect<1?50:38;camera.updateProjectionMatrix();
+}
+addEventListener("resize",resize);resize();
+const camScale=()=>camera.aspect<1?1:.62; // pull in on wide screens
+
+/* ================= materials & helpers ================= */
+const matCache={};
+const M=(c,o={})=>{const k=c+JSON.stringify(o);return matCache[k]||(matCache[k]=new THREE.MeshLambertMaterial({color:c,flatShading:true,...o}))};
+function mesh(geo,col,parent,x=0,y=0,z=0,shadow=true){const m=new THREE.Mesh(geo,typeof col=="number"?M(col):col);m.position.set(x,y,z);
+  m.castShadow=shadow;m.receiveShadow=true;parent&&parent.add(m);return m}
+const box=(w,h,d,c,p,x,y,z)=>mesh(new THREE.BoxGeometry(w,h,d),c,p,x,y,z);
+
+/* ================= lights & sky ================= */
+const hemi=new THREE.HemisphereLight(0xffffff,0x4a7a2a,1.6);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff1d0,2.6);sun.position.set(6,12,8);sun.castShadow=true;
+sun.shadow.mapSize.set(512,512);Object.assign(sun.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:40});scene.add(sun);
+scene.background=new THREE.Color(0x8696a8);scene.fog=new THREE.Fog(0x8696a8,28,70);
+const SKY={day:{bg:0x8fd3ff,sun:2.6,hemi:1.6,star:0,win:0},rain:{bg:0x8696a8,sun:.7,hemi:1.2,star:0,win:.3},
+  dusk:{bg:0xff9e6b,sun:1.3,hemi:1.0,star:.2,win:.6},night:{bg:0x1b2550,sun:.2,hemi:.45,star:1,win:1},
+  sunset:{bg:0xffb38a,sun:1.8,hemi:1.3,star:.15,win:.4}};
+let skyNow={bg:new THREE.Color(0x8696a8),sun:.7,hemi:1.2,star:0,win:.3};
+
+/* stars */
+const starGeo=new THREE.BufferGeometry(),sp=[];
+for(let i=0;i<220;i++){const a=rand(0,Math.PI*2),e=rand(.15,1.3),r=90;sp.push(Math.cos(a)*Math.cos(e)*r,Math.sin(e)*r,Math.sin(a)*Math.cos(e)*r-20)}
+starGeo.setAttribute("position",new THREE.Float32BufferAttribute(sp,3));
+const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1,sizeAttenuation:false,transparent:true,opacity:0,fog:false}));scene.add(stars);
+
+/* ================= world ================= */
+const ground=mesh(new THREE.PlaneGeometry(90,90),0x6dbb4a,scene,0,0,0,false);ground.rotation.x=-Math.PI/2;
+// grass tufts (instanced)
+{const g=new THREE.ConeGeometry(.09,.32,3),n=700,im=new THREE.InstancedMesh(g,M(0x4f9a35),n),m=new THREE.Matrix4(),q=new THREE.Quaternion(),s=new THREE.Vector3();
+ let k=0;while(k<n){const x=rand(-22,22),z=rand(-20,10);if(Math.abs(x)<4&&z>-2.6&&z<2.6)continue;
+  s.setScalar(rand(.7,1.5));m.compose(new THREE.Vector3(x,.14,z),q.setFromEuler(new THREE.Euler(0,rand(0,3),0)),s);im.setMatrixAt(k++,m)}
+ im.receiveShadow=true;scene.add(im)}
+// tiny wildflowers
+{const cols=[0xffffff,0xffd23f,0xff8fc4,0xb48cff];for(let i=0;i<90;i++){const x=rand(-18,18),z=rand(-16,9);if(Math.abs(x)<4.4&&z>-2.8&&z<3)continue;
+  box(.12,.12,.12,cols[i%4],scene,x,.2,z).castShadow=false}}
+// dirt path
+for(let i=0;i<9;i++){const p=box(1.3,.04,1.3,0xc9a26b,scene,-5.4+i*.15+rand(-.2,.2),.02,-4.2+i*.9);p.castShadow=false;p.rotation.y=rand(-.3,.3)}
+// tilled plot
+const soilMat=new THREE.MeshLambertMaterial({color:0x7a4a26,flatShading:true});
+mesh(new THREE.BoxGeometry(7,.16,4.2),soilMat,scene,0,.08,-.2,false);
+for(const z of [-1.1,.7])mesh(new THREE.BoxGeometry(6.6,.12,.6),soilMat,scene,0,.2,z,false);
+// fence (back + sides)
+const wood=0x9c6a3c;
+for(let x=-3.8;x<=3.81;x+=.95)box(.16,.8,.16,wood,scene,x,.4,-2.5);
+box(7.8,.1,.08,wood,scene,0,.6,-2.5);box(7.8,.1,.08,wood,scene,0,.32,-2.5);
+for(const x of [-3.8,3.8]){for(let z=-2.5;z<=1.2;z+=.93)box(.16,.8,.16,wood,scene,x,.4,z);
+  box(.08,.1,3.8,wood,scene,x,.6,-.65);box(.08,.1,3.8,wood,scene,x,.32,-.65)}
+// cabin
+const cabin=new THREE.Group();cabin.position.set(-6.2,0,-7.5);cabin.rotation.y=.35;scene.add(cabin);
+box(4.2,2.6,3.2,0xc98b52,cabin,0,1.3,0);
+for(let y=.3;y<2.6;y+=.45)box(4.25,.06,3.25,0xa86f3e,cabin,0,y,0).castShadow=false;
+{const r1=box(2.6,.25,3.7,0xb8432f,cabin,-1.05,3.1,0);r1.rotation.z=.62;const r2=box(2.6,.25,3.7,0xb8432f,cabin,1.05,3.1,0);r2.rotation.z=-.62}
+box(.5,1.2,.5,0x8a4b2a,cabin,1.1,3.6,-.6);
+box(.85,1.5,.08,0x6b3a1a,cabin,-.8,.75,1.62);
+const winMat=new THREE.MeshLambertMaterial({color:0xffe9a8,emissive:0xffb347,emissiveIntensity:.3});
+mesh(new THREE.BoxGeometry(.9,.75,.08),winMat,cabin,.9,1.5,1.62);
+// trees
+function tree(x,z,s=1){const t=new THREE.Group();t.position.set(x,0,z);t.scale.setScalar(s);scene.add(t);
+  mesh(new THREE.CylinderGeometry(.22,.32,1.6,6),0x7a4a26,t,0,.8,0);
+  [[0,2.2,0,1.3,0x3f8f3a],[.6,1.8,.3,.95,0x4fa548],[-.6,1.9,-.2,1,0x47993f],[0,2.9,0,.9,0x5bb550]]
+    .forEach(([a,b,c,r,col])=>mesh(new THREE.IcosahedronGeometry(r,0),col,t,a,b,c));return t}
+tree(6.5,-6,1.3);tree(-10,-2,1.1);tree(9,1,1);tree(2.5,-11,1.4);tree(-3,-13,1.2);tree(12,-9,1.5);tree(-12,4,1.2);tree(-8,-12,1);
+// bushes & rocks
+[[5.2,-3],[-4.8,2.6],[6,3.2],[-9,-6]].forEach(([x,z])=>mesh(new THREE.IcosahedronGeometry(.6,0),0x4a9a3a,scene,x,.4,z));
+[[4.8,1.8],[-5.2,-2],[7.5,-1]].forEach(([x,z])=>mesh(new THREE.DodecahedronGeometry(.35,0),0x9a9a9a,scene,x,.2,z));
+// clouds
+const clouds=[];for(let i=0;i<6;i++){const c=new THREE.Group();c.position.set(rand(-30,30),rand(13,18),rand(-35,-15));
+  for(let j=0;j<4;j++)mesh(new THREE.BoxGeometry(rand(2,3.5),rand(1,1.6),rand(1.5,2.5)),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x777777}),c,j*1.6-2.4,rand(-.3,.4),rand(-.5,.5),false);
+  scene.add(c);clouds.push(c)}
+
+/* ================= flowers ================= */
+function sunflower(h){
+  const g=new THREE.Group();mesh(new THREE.CylinderGeometry(.05,.07,h,5),0x3f8f3a,g,0,h/2,0);
+  for(const s of [-1,1]){const l=mesh(new THREE.SphereGeometry(1,6,3),0x4fa548,g,s*.24,h*.42,0);l.scale.set(.3,.04,.13);l.rotation.z=s*.45}
+  const head=new THREE.Group();head.position.y=h;g.add(head);
+  const face=new THREE.Group();face.rotation.x=-.35;head.add(face);
+  mesh(new THREE.CylinderGeometry(.27,.27,.09,10),0x3b2008,face).rotation.x=Math.PI/2;
+  mesh(new THREE.CylinderGeometry(.15,.15,.1,8),0x6b4a1a,face,0,0,.01).rotation.x=Math.PI/2;
+  for(let r=0;r<2;r++)for(let i=0;i<12;i++){const pv=new THREE.Group();pv.rotation.z=i/12*Math.PI*2+r*.26;face.add(pv);
+    mesh(new THREE.BoxGeometry(.14,.34,.03),r?0xffd23f:0xf29100,pv,0,r?.38:.42,r?.012:-.012)}
+  g.userData.head=head;return g}
+function lily(h,c1,c2){
+  const g=new THREE.Group();mesh(new THREE.CylinderGeometry(.035,.05,h,5),0x4c9a3a,g,0,h/2,0);
+  for(const s of [-1,1]){const l=mesh(new THREE.SphereGeometry(1,6,3),0x5aa83c,g,s*.18,h*.35,0);l.scale.set(.26,.03,.07);l.rotation.z=s*.7}
+  const head=new THREE.Group();head.position.y=h;g.add(head);
+  const cup=new THREE.Group();cup.rotation.x=.45;head.add(cup);
+  for(let i=0;i<6;i++){const pv=new THREE.Group();pv.rotation.y=i*Math.PI/3+(i%2)*.15;cup.add(pv);
+    const tl=new THREE.Group();tl.rotation.x=i%2?1.05:.9;pv.add(tl);
+    const p=mesh(new THREE.SphereGeometry(1,6,4),i%2?c1:c2,tl,0,.28,0);p.scale.set(.12,.32,.035);
+    const tip=mesh(new THREE.SphereGeometry(1,5,3),0xffffff,tl,0,.48,.01,false);tip.scale.set(.05,.1,.02);tip.material=M(i%2?0xfff0f6:0xffffff)}
+  for(let i=0;i<5;i++){const pv=new THREE.Group();pv.rotation.y=i*1.26;pv.rotation.x=.25;cup.add(pv);
+    mesh(new THREE.CylinderGeometry(.008,.008,.3,3),0xd8eaa0,pv,0,.15,0,false);box(.06,.03,.03,0x8a3a10,pv,0,.31,0)}
+  g.userData.head=head;return g}
+
+// plants in the plot
+const plants=[];
+[[-2.2,-1.1],[0,-1.1],[2.2,-1.1]].forEach(([x,z],i)=>plants.push({g:sunflower(2+(i%2)*.35),x,z,sun:true}));
+[[-2.6,.7,0xff5f9e,0xff9cc7],[-.9,.7,0xffffff,0xfff3c4],[.9,.7,0xff5f9e,0xff9cc7],[2.6,.7,0xffffff,0xfff3c4]]
+  .forEach(([x,z,a,b])=>plants.push({g:lily(1.15,a,b),x,z}));
+const mounds=[];
+plants.forEach(p=>{p.g.position.set(p.x,.24,p.z);p.g.scale.setScalar(.001);p.g.userData.head.scale.setScalar(.001);scene.add(p.g);
+  const m=mesh(new THREE.SphereGeometry(.22,6,3,0,Math.PI*2,0,Math.PI/2),0x5a3418,scene,p.x,.24,p.z);m.scale.setScalar(.001);mounds.push(m)});
+
+/* bouquet (held at the end) */
+const bouquet=new THREE.Group();
+{const wm=c=>new THREE.MeshLambertMaterial({color:c,emissive:c,emissiveIntensity:.35,flatShading:true,side:THREE.DoubleSide});
+ const w=mesh(new THREE.ConeGeometry(.3,.8,8,1,true),wm(0xff5f9e),bouquet,0,.4,0);w.rotation.x=Math.PI;
+ const w2=mesh(new THREE.ConeGeometry(.24,.7,8,1,true),wm(0xffe3ee),bouquet,0,.44,.07);w2.rotation.x=Math.PI;
+ mesh(new THREE.TorusGeometry(.1,.04,4,8),0xffd23f,bouquet,0,.22,0).rotation.x=Math.PI/2;
+ [[-.36,.7,.04,.45,0xff5f9e,0xff9cc7],[.36,.72,.04,-.45,0xffffff,0xfff3c4],[0,.62,.16,0,0xff5f9e,0xff9cc7]].forEach(([x,y,z,r,a,b])=>{const f=lily(.35,a,b);f.position.set(x*.6,y-.35,z);f.rotation.z=r;f.scale.setScalar(.75);bouquet.add(f)});
+ [[0,1.15,-.06,0],[-.3,1,-.02,.4],[.3,1.02,-.02,-.4]].forEach(([x,y,z,r])=>{const f=sunflower(.7);f.position.set(x*.5,y-.75,z);f.rotation.z=r;f.scale.setScalar(.8);bouquet.add(f)})}
+
+/* ================= farmer ================= */
+const farmer=new THREE.Group();scene.add(farmer);farmer.position.set(-5.2,0,-3.4);
+const skin=0xf2c09a;
+const legL=new THREE.Group(),legR=new THREE.Group();legL.position.set(-.13,.5,0);legR.position.set(.13,.5,0);farmer.add(legL,legR);
+box(.2,.5,.22,0x2f4a8a,legL,0,-.25,0);box(.2,.5,.22,0x2f4a8a,legR,0,-.25,0);
+box(.22,.1,.3,0x4a2a14,legL,0,-.48,.04);box(.22,.1,.3,0x4a2a14,legR,0,-.48,.04);
+const torso=box(.56,.56,.36,0x4a7bd0,farmer,0,.8,0);box(.4,.3,.37,0x3a62b0,farmer,0,.7,0);
+const armL=new THREE.Group(),armR=new THREE.Group();armL.position.set(-.36,1.03,0);armR.position.set(.36,1.03,0);farmer.add(armL,armR);
+box(.16,.5,.18,0x4a7bd0,armL,0,-.22,0);box(.16,.14,.18,skin,armL,0,-.5,0);
+box(.16,.5,.18,0x4a7bd0,armR,0,-.22,0);box(.16,.14,.18,skin,armR,0,-.5,0);
+const headG=new THREE.Group();headG.position.y=1.38;farmer.add(headG);
+box(.56,.5,.5,skin,headG,0,0,0);box(.62,.2,.56,0x5a3418,headG,0,.27,0);box(.62,.4,.14,0x5a3418,headG,0,.08,-.22);
+box(.1,.3,.5,0x5a3418,headG,-.29,.06,0);box(.1,.3,.5,0x5a3418,headG,.29,.06,0);
+const eyeL=box(.08,.1,.02,0x2b1a10,headG,-.12,.02,.26),eyeR=box(.08,.1,.02,0x2b1a10,headG,.12,.02,.26);
+box(.1,.05,.02,0xff9aa8,headG,-.2,-.09,.255).castShadow=false;box(.1,.05,.02,0xff9aa8,headG,.2,-.09,.255).castShadow=false;
+// straw hat
+mesh(new THREE.CylinderGeometry(.5,.5,.05,10),0xe8c46a,headG,0,.33,0);mesh(new THREE.CylinderGeometry(.3,.33,.22,10),0xe8c46a,headG,0,.44,0);
+mesh(new THREE.CylinderGeometry(.335,.335,.06,10),0xd84a4a,headG,0,.37,0);
+// watering can (hidden until used)
+const can=new THREE.Group();box(.26,.22,.18,0x8fb8c8,can,0,0,0);const sp1=box(.06,.06,.3,0x8fb8c8,can,0,.05,.2);sp1.rotation.x=-.5;can.visible=false;armR.add(can);can.position.set(0,-.62,.12);
+farmer.traverse(o=>{if(o.isMesh)o.castShadow=true});
+let walking=false,armUp=0;
+
+/* ================= particles ================= */
+const parts=[];
+function burst(pos,n,color,{spread=1.6,up=2.5,life=1,size=2,grav=-5,box:bx=0}={}){
+  const p=new Float32Array(n*3),v=[];
+  for(let i=0;i<n;i++){p[i*3]=pos.x+rand(-bx,bx);p[i*3+1]=pos.y;p[i*3+2]=pos.z+rand(-bx*.5,bx*.5);v.push(new THREE.Vector3(rand(-spread,spread),rand(up*.3,up),rand(-spread,spread)))}
+  const geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.BufferAttribute(p,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({color,size,sizeAttenuation:false,transparent:true}));scene.add(pts);
+  parts.push({pts,v,life,age:0,grav})}
+// rain
+const RN=420,rainPos=new Float32Array(RN*6);
+for(let i=0;i<RN;i++){const x=rand(-14,14),y=rand(0,16),z=rand(-12,10);rainPos.set([x,y,z,x-.05,y+.5,z],i*6)}
+const rainGeo=new THREE.BufferGeometry();rainGeo.setAttribute("position",new THREE.BufferAttribute(rainPos,3));
+const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0xcfe6ff,transparent:true,opacity:.7}));scene.add(rain);
+let raining=true;
+
+/* ================= tweens ================= */
+const tweens=[];const now=()=>performance.now();
+const ease={lin:t=>t,out:t=>1-(1-t)**3,inOut:t=>t<.5?4*t*t*t:1-(-2*t+2)**3/2,back:t=>1+2.7*(t-1)**3+1.7*(t-1)**2,
+  elastic:t=>t===0||t===1?t:2**(-10*t)*Math.sin((t*10-.75)*2.094)+1};
+function tw(dur,fn,e=ease.inOut,delay=0){return new Promise(res=>tweens.push({t0:now()+delay*1000,dur:dur*1000,fn,e,res}))}
+function camTo(pos,look,dur=1.6){const p0=camera.position.clone(),l0=camLook.clone(),s=camScale();
+  const p1=new THREE.Vector3(...pos).sub(new THREE.Vector3(...look)).multiplyScalar(s).add(new THREE.Vector3(...look)),l1=new THREE.Vector3(...look);
+  return tw(dur,k=>{camera.position.lerpVectors(p0,p1,k);camLook.lerpVectors(l0,l1,k)})}
+function setSky(name,dur=1.2){const a={...skyNow,bg:skyNow.bg.clone()},b=SKY[name],bc=new THREE.Color(b.bg);
+  return tw(dur,k=>{skyNow.bg.lerpColors(a.bg,bc,k);for(const q of ["sun","hemi","star","win"])skyNow[q]=a[q]+(b[q]-a[q])*k})}
+function walkTo(x,z,speed=2.2){const p0=farmer.position.clone(),p1=new THREE.Vector3(x,0,z),d=p0.distanceTo(p1);
+  const tgt=Math.atan2(x-p0.x,z-p0.z);farmer.rotation.y=tgt;walking=true;
+  return tw(d/speed,k=>farmer.position.lerpVectors(p0,p1,k),ease.lin).then(()=>{walking=false})}
+const face=(r=0,d=.3)=>{const r0=farmer.rotation.y;return tw(d,k=>farmer.rotation.y=r0+(r-r0)*k)};
+
+/* ================= main loop ================= */
+let last=now(),mode="title",orbit=0;
+camera.position.set(0,7,15);
+function loop(){
+  const t=now(),dt=Math.min(.05,(t-last)/1000);last=t;
+  for(let i=tweens.length-1;i>=0;i--){const w=tweens[i],k=(t-w.t0)/w.dur;if(k<0)continue;const kk=Math.min(1,k);w.fn(w.e(kk));if(kk>=1){tweens.splice(i,1);w.res()}}
+  if(mode=="title"){orbit+=dt*.12;const s=camScale();camera.position.set(Math.sin(orbit)*16*s,7.5*s+1,Math.cos(orbit)*16*s);camLook.set(0,1,0)}
+  camera.lookAt(camLook);
+  // sky
+  scene.background.copy(skyNow.bg);scene.fog.color.copy(skyNow.bg);sun.intensity=skyNow.sun;hemi.intensity=skyNow.hemi;
+  stars.material.opacity=skyNow.star;winMat.emissiveIntensity=.2+skyNow.win*1.4;
+  // rain
+  rain.visible=raining||rain.material.opacity>0.01;rain.material.opacity+=((raining?.7:0)-rain.material.opacity)*dt*2;
+  if(rain.visible){for(let i=0;i<RN;i++){let y=rainPos[i*6+1]-dt*16;if(y<0)y+=16;rainPos[i*6+1]=y;rainPos[i*6+4]=y+.5}rainGeo.attributes.position.needsUpdate=true}
+  // clouds
+  clouds.forEach(c=>{c.position.x+=dt*.5;if(c.position.x>40)c.position.x=-40});
+  // farmer animation
+  const tt=t/1000,sw=walking?Math.sin(tt*14)*.7:0;
+  legL.rotation.x=sw;legR.rotation.x=-sw;
+  armL.rotation.x+=((walking?-sw*.8:armUp?-Math.PI*.95:0)-armL.rotation.x)*.25;
+  armR.rotation.x+=((walking?sw*.8:armUp?-Math.PI*.95:0)-armR.rotation.x)*.25;
+  torso.position.y=.8+(walking?Math.abs(Math.sin(tt*14))*.05:Math.sin(tt*2)*.015);headG.position.y=torso.position.y+.58;
+  const blink=(tt%3.5)<.12?.15:1;eyeL.scale.y=eyeR.scale.y=blink;
+  // flowers sway
+  plants.forEach((p,i)=>{p.g.rotation.z=Math.sin(tt*1.4+i)*.04});
+  // particles
+  for(let i=parts.length-1;i>=0;i--){const P=parts[i];P.age+=dt;const a=P.pts.geometry.attributes.position;
+    for(let j=0;j<P.v.length;j++){P.v[j].y+=P.grav*dt;a.array[j*3]+=P.v[j].x*dt;a.array[j*3+1]+=P.v[j].y*dt;a.array[j*3+2]+=P.v[j].z*dt}
+    a.needsUpdate=true;P.pts.material.opacity=1-P.age/P.life;
+    if(P.age>P.life){scene.remove(P.pts);P.pts.geometry.dispose();P.pts.material.dispose();parts.splice(i,1)}}
+  renderer.render(scene,camera);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+
+/* ================= cozy farm soundtrack (all synthesized, original) ================= */
+let AC,muted=false,master,dry,wet,rainGain,mStep=0,mNext=0,birdT=0,crickT=0,stepT=0;
+const hz=n=>440*2**((n-69)/12);
+function ac(){
+  if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();
+    master=AC.createGain();master.connect(AC.destination);
+    dry=AC.createGain();dry.connect(master);
+    // small room reverb from a decaying noise impulse
+    const len=AC.sampleRate*2.2,ir=AC.createBuffer(2,len,AC.sampleRate);
+    for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len)**3}
+    const cv=AC.createConvolver();cv.buffer=ir;wet=AC.createGain();wet.gain.value=.32;cv.connect(wet).connect(master);dry.cv=cv;
+    // rain ambience loop
+    const nb=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+    const src=AC.createBufferSource();src.buffer=nb;src.loop=true;
+    const lp=AC.createBiquadFilter();lp.type="lowpass";lp.frequency.value=1800;const hp=AC.createBiquadFilter();hp.type="highpass";hp.frequency.value=300;
+    rainGain=AC.createGain();rainGain.gain.value=0;src.connect(lp).connect(hp).connect(rainGain).connect(master);src.start()}
+  if(AC.state=="suspended")AC.resume();return AC}
+const out=(node,rev=.6)=>{node.connect(dry);if(rev){const s=AC.createGain();s.gain.value=rev;node.connect(s).connect(dry.cv)}};
+function env(g,t,a,peak,d){g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d)}
+function osc(type,f,t,dur,peak,{a=.005,rev=.6,f1,lp}={}){const o=AC.createOscillator(),g=AC.createGain();o.type=type;
+  o.frequency.setValueAtTime(f,t);if(f1)o.frequency.exponentialRampToValueAtTime(f1,t+dur);env(g,t,a,peak,dur);
+  let n=o.connect(g);if(lp){const F=AC.createBiquadFilter();F.type="lowpass";F.frequency.value=lp;n=n.connect(F)}
+  out(n,rev);o.start(t);o.stop(t+a+dur+.05)}
+// plucked nylon-guitar-ish tone
+function pluck(n,t,v=.07){const f=hz(n);osc("triangle",f,t,1.4,v,{lp:2200});osc("sine",f*2,t,.5,v*.35,{rev:.4})}
+// soft wooden flute with vibrato
+function flute(n,t,dur,v=.05){const f=hz(n),o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();
+  o.type="sine";o2.type="triangle";o.frequency.value=f;o2.frequency.value=f;l.frequency.value=5.2;lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(f*.006,t+.25);
+  l.connect(lg);lg.connect(o.frequency);lg.connect(o2.frequency);
+  const g2=AC.createGain();g2.gain.value=.25;o2.connect(g2).connect(g);o.connect(g);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.07);g.gain.setValueAtTime(v*.85,t+Math.max(.08,dur-.08));g.gain.exponentialRampToValueAtTime(.0001,t+dur+.25);
+  out(g,.9);[o,o2,l].forEach(x=>{x.start(t);x.stop(t+dur+.3)})}
+function noiseHit(t,dur,freq,v,type="bandpass",rev=.2){const b=AC.createBuffer(1,Math.max(1,AC.sampleRate*dur),AC.sampleRate),c=b.getChannelData(0);
+  for(let i=0;i<c.length;i++)c[i]=(Math.random()*2-1)*(1-i/c.length)**2;
+  const s=AC.createBufferSource(),F=AC.createBiquadFilter(),g=AC.createGain();F.type=type;F.frequency.value=freq;g.gain.value=v;s.buffer=b;out(s.connect(F).connect(g),rev);s.start(t)}
+const T=()=>AC.currentTime;
+const S={
+  blip:()=>AC&&osc("sine",hz(86+Math.floor(Math.random()*4)),T(),.04,.03,{rev:0}),
+  pop:()=>AC&&osc("sine",hz(81),T(),.12,.08,{f1:hz(93)}),
+  step:()=>AC&&noiseHit(T(),.07,420+Math.random()*120,.25,"lowpass",0),
+  plant:()=>{if(!AC)return;noiseHit(T(),.12,500,.5,"lowpass",.1);osc("sine",160,T(),.15,.18,{f1:70,rev:.1})},
+  water:()=>{if(!AC)return;for(let i=0;i<14;i++)osc("sine",rand(1400,2600),T()+i*.09+rand(0,.05),.08,.035,{f1:rand(500,900),rev:.5});noiseHit(T(),1.4,2600,.07)},
+  chime:()=>AC&&[79,83,86,91].forEach((n,i)=>osc("sine",hz(n),T()+i*.09,1.2,.05,{rev:1})),
+  bloom:()=>AC&&[72,76,79,83,84,88].forEach((n,i)=>pluck(n,T()+i*.045,.06)),
+  item:()=>{if(!AC)return;const t=T();[[67,0],[71,.1],[74,.2],[79,.3]].forEach(([n,w])=>pluck(n,t+w,.08));
+    [83,86,91].forEach((n,i)=>osc("sine",hz(n),t+.45+i*.12,1.4,.07,{rev:1}));flute(91,t+.45,.9,.05)},
+  heart:()=>AC&&osc("sine",hz(88),T(),.25,.06,{f1:hz(95),rev:.8}),
+  fanfare:()=>{if(!AC)return;const t=T();[[72,76,79],[74,77,81],[76,79,84]].forEach((ch,i)=>ch.forEach(n=>pluck(n,t+i*.32,.07)));
+    flute(84,t+.96,.5);flute(88,t+1.46,.5);flute(91,t+1.96,1.4)},
+  bird:()=>{if(!AC)return;const t=T(),b=rand(2600,3800),n=2+Math.floor(Math.random()*3);
+    for(let i=0;i<n;i++)osc("sine",b*rand(.9,1.1),t+i*.13,.09,.025,{f1:b*rand(1.2,1.5),rev:.7})},
+  cricket:()=>{if(!AC)return;const t=T();for(let i=0;i<6;i++)osc("square",4300,t+i*.045,.02,.006,{rev:.3,lp:5000})},
+};
+// background music: 24-bar loop. Chords are plucked 8th-note arpeggios; a flute sings the melody.
+const CH=[[48,4],[45,3],[41,4],[43,4],[40,3],[41,4],[38,3],[43,4]]; // root, third(3=minor,4=major)
+const PROG=[0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7];
+const MEL=[ // [midi, beats] per bar, 0 = rest
+  [[76,1.5],[74,.5],[72,1],[79,1]],[[81,2],[79,1],[76,1]],[[77,1.5],[76,.5],[74,1],[72,1]],[[74,3],[0,1]],
+  [[76,1],[79,1],[83,1.5],[81,.5]],[[81,2],[79,1],[77,1]],[[77,1.5],[76,.5],[74,1],[77,1]],[[79,3],[0,1]],
+  [[76,1.5],[74,.5],[72,1],[79,1]],[[81,2],[79,1],[76,1]],[[77,1.5],[76,.5],[74,1],[72,1]],[[74,1],[76,1],[77,1],[79,1]],
+  [[83,1.5],[81,.5],[79,1],[76,1]],[[84,2],[81,1],[77,1]],[[86,1],[84,1],[81,1],[77,1]],[[79,4]],
+  [[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]],[[0,4]]];
+const BEAT=60/92;
+function music(){if(!AC||muted)return;
+  while(mNext<AC.currentTime+.5){const bar=mStep%24,[r,third]=CH[PROG[bar]],t=Math.max(mNext,AC.currentTime+.01);
+    const arp=[r,r+7,r+12,r+12+third,r+19,r+12+third,r+12,r+7];
+    arp.forEach((n,i)=>pluck(n,t+i*BEAT/2,i==0?.075:.05));
+    osc("sine",hz(r-12),t,BEAT*3.6,.07,{a:.03,rev:.2});
+    let off=0;for(const [n,b] of MEL[bar]){if(n)flute(n,t+off*BEAT,b*BEAT*.95);off+=b}
+    mStep++;mNext+=BEAT*4}}
+setInterval(()=>{music();if(!AC||muted)return;
+  const day=skyNow.star<.3&&!raining,night=skyNow.star>.7;
+  rainGain.gain.value+=((raining?.12:0)-rainGain.gain.value)*.2;
+  if(day&&T()>birdT){S.bird();birdT=T()+rand(2.5,6)}
+  if(night&&T()>crickT){S.cricket();crickT=T()+rand(.4,1.2)}
+  if(walking&&T()>stepT){S.step();stepT=T()+.24}},120);
+$("mute").onclick=()=>{muted=!muted;master&&(master.gain.value=muted?0:1);$("mute").textContent=muted?"🔇":"🔊";if(!muted&&AC)mNext=AC.currentTime+.05};
+
+/* ================= HUD ================= */
+let hearts=1;
+function drawHearts(){$("hrow").innerHTML=Array.from({length:10},(_,i)=>i<hearts?"<b>♥</b>":"♥").join("")}
+async function addHearts(n){for(let i=0;i<n;i++){hearts=Math.min(10,hearts+1);drawHearts();S.heart();floatHeart(40+i*12,60);await sleep(220)}}
+function floatHeart(x,y){const s=document.createElement("span");s.className="fx";s.textContent="♥";s.style.left=x+"px";s.style.top=y+"px";
+  s.style.fontSize=rand(18,30)+"px";s.style.setProperty("--x",rand(-60,60)+"px");document.body.appendChild(s);setTimeout(()=>s.remove(),1900)}
+const setClock=(d,t,w)=>{$("day").textContent="Spr. "+d;$("time").textContent=t+" "+w};
+
+/* ================= pixel portrait ================= */
+const PAL={h:"#5a3418",s:"#f2c09a",e:"#2b1a10",m:"#b0414f",b:"#ff9aa8",c:"#4a7bd0",d:"#33599e",t:"#7fd3ff",y:"#e8c46a",r:"#d84a4a"};
+const BASE=["...yyyyyyyyyy...","..yyyyyyyyyyyy..","yyyyrrrrrrrryyyy","..hhhhhhhhhhhh..","..hssssssssssh..","..sseesssseess..","..sseesssseess..",
+  "..sbbssssssbbs..","..ssssssssssss..","..ssssssssssss..","...ssssssssss...","....ssssssss....","...cccccccccc...","..cccdccccdccc..",".cccdccccccdccc.",".cccdccccccdccc."];
+function portrait(mood){const rows=[...BASE];
+  if(mood=="sad"){rows[7]="..stbssssssbts..";rows[8]="..sssssmmsssss..";rows[9]="..ssssmssmssss.."}
+  else{rows[8]="..ssssmssmssss..";rows[9]="..sssssmmsssss.."}
+  const x=$("portrait").getContext("2d");x.clearRect(0,0,16,16);
+  rows.forEach((r,y)=>[...r].forEach((ch,X)=>{if(PAL[ch]){x.fillStyle=PAL[ch];x.fillRect(X,y,1,1)}}))}
+
+/* ================= story ================= */
+const P=(x,y,z)=>new THREE.Vector3(x,y,z);
+const STEPS=[
+  {text:"Spring 1. A gloomy, rainy morning in Reet Valley…",act:async()=>{camTo([0,7,15],[0,.8,0],2.2)}},
+  {who:"me",mood:"sad",text:"Reet… I messed up. And I'm really, really sorry. 🥺",act:async()=>{
+    await walkTo(-3.2,2.4);await face(0);camTo([-2,3.2,8.5],[-3.2,1.2,2.4],1.6)}},
+  {who:"me",mood:"sad",text:"I can't bring you real flowers right now… so I'm going to grow some for you. With my own two hands.",act:async()=>{}},
+  {text:"You planted Sunflower Seeds and Lily Bulbs. ✿",act:async()=>{
+    camTo([0,7,13],[0,.6,0],1.6);raining=false;setSky("day",2.5);setClock(1,"9:00am","☀");
+    await walkTo(-2.6,2.1,3);
+    for(const [i,p] of plants.entries()){await walkTo(p.x,2.1,3.2);farmer.rotation.y=Math.PI;S.plant();
+      tw(.4,k=>mounds[i].scale.setScalar(Math.max(.001,k)),ease.back);burst(P(p.x,.4,p.z),8,0x8a5a2a,{spread:.8,up:2,life:.6});await sleep(150)}
+    await walkTo(4.6,1.6,3);await face(-.4);addHearts(1)}},
+  {text:"You watered them with lots and lots of love. 💧",act:async()=>{
+    can.visible=true;await walkTo(3.2,1.6,3);farmer.rotation.y=-Math.PI/2;armUp=0;
+    tw(.3,k=>armR.rotation.z=k*.5);S.water();
+    for(let i=0;i<7;i++){burst(P(rand(-3,3),2.4,rand(-1.3,1)),26,0x7fc8ff,{spread:.3,up:.2,life:.7,grav:-9,box:1.4});await sleep(180)}
+    const c0=soilMat.color.clone(),c1=new THREE.Color(0x4a2a14);await tw(1,k=>soilMat.color.lerpColors(c0,c1,k));
+    armR.rotation.z=0;can.visible=false;await walkTo(4.6,1.6,3);await face(-.4);addHearts(1)}},
+  {text:"Days passed. Every night, I looked at the stars and thought about you…",act:async()=>{
+    camTo([0,8,15],[0,1,0],1.5);
+    for(let d=1;d<=3;d++){
+      setClock(d,"6:00pm","☀");await setSky("dusk",.7);setClock(d,"11:30pm","☾");await setSky("night",.7);
+      S.chime();
+      await Promise.all(plants.map((p,i)=>tw(.9,k=>{const s=(d-1+k)/3;p.g.scale.setScalar(Math.max(.001,s*.85));if(d==1)mounds[i].scale.setScalar(Math.max(.001,1-k))})));
+      setClock(d+1,"6:00am","☀");await setSky("day",.7)}
+    addHearts(2)}},
+  {text:"Spring 4. Something wonderful happened in the garden!",act:async()=>{
+    camTo([0,4.5,9.5],[0,1.2,-.2],1.6);await sleep(700);
+    for(const p of plants){S.bloom();tw(.3,k=>p.g.scale.setScalar(.85+.15*k));
+      await tw(.55,k=>{p.g.userData.head.scale.setScalar(Math.max(.001,k));p.g.userData.head.rotation.y=(1-k)*3},ease.back);
+      const hp=new THREE.Vector3();p.g.userData.head.getWorldPosition(hp);burst(hp,22,p.sun?0xffe066:0xffb3d9,{spread:1.5,up:2.2,life:.9,grav:-2})}
+    addHearts(2)}},
+  {who:"me",mood:"happy",text:"Sunflowers, because you're my sunshine. 🌻 Lilies, because you're the prettiest one in the whole valley.",act:async()=>{
+    await walkTo(0,2.6,2.6);await face(0);camTo([0,2.8,8],[0,1.4,1.2],1.4)}},
+  {text:"",item:true,act:async()=>{
+    armUp=1;bouquet.position.set(0,1.95,.05);bouquet.scale.setScalar(.001);farmer.add(bouquet);
+    camTo([0,2.55,7.4],[0,2.25,2.6],1);
+    await tw(.5,k=>bouquet.scale.setScalar(Math.max(.001,k*.72)),ease.back);S.item();$("item").classList.add("on");
+    const bp=new THREE.Vector3();bouquet.getWorldPosition(bp);bp.y+=.7;
+    for(let i=0;i<3;i++){burst(bp,18,0xfff6a0,{spread:1.8,up:1.8,life:1,grav:-1});await sleep(250)}
+    await sleep(1400);$("item").classList.remove("on");addHearts(1)}},
+  {who:"me",mood:"happy",text:"Reet, will you accept my bouquet… and forgive me? 💛",choice:true,act:async()=>{setSky("sunset",2);setClock(4,"5:40pm","☀")}},
 ];
-F.forEach(f=>stem(f[1],f[2],(f[1]-200)*-.15));
-leaf(110,250,-150,1.2);leaf(290,250,-30,1.25);leaf(70,190,-160,1.3);leaf(330,185,-20,1.35);
-F.forEach((f,i)=>{const d=1+i*.18;f[0]=="s"?sunflower(f[1],f[2],f[3],d):lily(f[1],f[2],f[3],f[4],d,f[5])});
 
-function rain(n,chars){for(let i=0;i<n;i++)setTimeout(()=>{
-  const s=document.createElement("span");s.className="p";s.textContent=chars[i%chars.length];
-  s.style.left=Math.random()*100+"vw";s.style.animationDuration=3+Math.random()*3+"s";
-  s.style.fontSize=14+Math.random()*16+"px";document.body.appendChild(s);setTimeout(()=>s.remove(),6500)},i*120)}
+let si=-1,typing=false,busy=false,full="";
+async function type(s){typing=true;full=s;$("txt").textContent="";
+  for(const ch of [...s]){if(!typing)break;$("txt").textContent+=ch;if(ch.trim())S.blip();await sleep(26)}
+  $("txt").textContent=full;typing=false}
+async function next(){
+  if(typing){typing=false;return}if(busy)return;
+  const st=STEPS[++si];if(!st)return;busy=true;$("nextA").classList.add("hide");$("choices").classList.add("hide");
+  const me=st.who=="me";$("side").classList.toggle("hide",!me);$("name").classList.toggle("hide",!me);
+  if(me){$("name").textContent="Me";portrait(st.mood)}
+  $("dlg").classList.toggle("hide",!!st.item);
+  const a=st.act?st.act():null;if(st.text)await type(st.text);if(a)await a;
+  if(st.item){$("dlg").classList.remove("hide");busy=false;return next()}
+  busy=false;if(st.choice)$("choices").classList.remove("hide");else $("nextA").classList.remove("hide")}
+$("box").addEventListener("click",e=>{if(e.target.closest("#choices"))return;next()});
 
-$("go").onclick=()=>{
-  document.body.classList.add("on");
-  rain(30,["🌻","🌸","💛","🌼"]);
-  setTimeout(()=>{$("msg").classList.add("show");$("yes").style.display="inline-block";$("yes").classList.add("show")},3000);
-};
-$("yes").onclick=e=>{
-  for(let i=0;i<24;i++){const h=document.createElement("span");h.className="h";h.textContent=["💛","💖","🌻","💕"][i%4];
-    h.style.left=e.clientX+"px";h.style.top=e.clientY+"px";h.style.setProperty("--x",(Math.random()*240-120)+"px");
-    h.style.animationDelay=Math.random()*.4+"s";document.body.appendChild(h);setTimeout(()=>h.remove(),2200)}
-  $("yes").textContent="Love you 💛";
-};
+$("newgame").onclick=async()=>{ac();mNext=AC.currentTime+.3;S.chime();$("title").classList.add("hide");
+  mode="story";$("hud").classList.remove("hide");drawHearts();await sleep(300);$("dlg").classList.remove("hide");next()};
+
+$("yes").onclick=async()=>{$("choices").classList.add("hide");S.fanfare();
+  await type("♥ Reet's heart level is now MAX! ♥");addHearts(10-hearts);
+  const bp=new THREE.Vector3();bouquet.getWorldPosition(bp);
+  for(let i=0;i<14;i++){floatHeart(rand(20,innerWidth-40),innerHeight*rand(.4,.8));
+    if(i%3==0)burst(P(rand(-3,3),rand(1.5,3.5),rand(-1,2)),30,[0xff5f9e,0xffd23f,0xffffff][i%3],{spread:2.2,up:2.5,life:1.4,grav:-1.5});await sleep(160)}
+  camTo([0,4,10],[0,1.5,0],2.5);await sleep(1200);$("dlg").classList.add("hide");$("letter").classList.add("on");S.chime()};
+const no=$("no");
+const flee=e=>{e.preventDefault();no.classList.add("run");S.pop();
+  no.style.left=rand(16,innerWidth-130)+"px";no.style.top=rand(80,innerHeight*.55)+"px";
+  no.textContent=["No","Sure? 🥺","pls 🥹","Wrong button!","Try Yes 💛"][Math.floor(Math.random()*5)]};
+no.addEventListener("touchstart",flee,{passive:false});no.addEventListener("mouseenter",flee);no.addEventListener("click",flee);
+$("again").onclick=()=>location.reload();
 </script>
 </body>
 </html>
